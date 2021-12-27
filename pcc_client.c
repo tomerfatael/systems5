@@ -9,8 +9,8 @@
 
 int main(int argc, char** argv) {
     uint16_t port;
-    uint32_t N, htonlN;
-    int sockfd, notWritten, nsent, written;
+    uint32_t N, htonlN, C;
+    int sockfd, bytesWrite, notWritten, totalSent, bytesRead, totalRead;
     char *ip, *path *outBuff, *inBuff;
     FILE *file;
     struct sockaddr_in serv_addr;
@@ -68,27 +68,43 @@ int main(int argc, char** argv) {
     /*sending file size to server*/
     notWritten = 4;
     while(notWritten > 0) {
-        nsent = write(sockfd, ) //to completeeee
+        bytesWrite = write(sockfd, ) //to completeeee
     }
 
     /*sending file to server*/
-    //written = 0; to delete
-    while(fgets(outBuff, N, file) != NULL) {
-        if(send(sockfd, outBuff, sizeof(outBuff), 0) == -1) {
-            perror("failed to send data\n");
+    notWritten = N; 
+    totalSent = 0;
+    while(notWritten > 0) {
+        bytesWrite = write(sockfd, outBuff+totalSent, notWritten);
+        if(bytesWrite < 0) {
+            perror("writing to socket failed\n");
             exit(1);
         }
+        totalSent += bytesWrite;
+        notWritten -= bytesWrite;
     }
 
-    
+    /*reading C from server*/
+    inBuff = (char*)malloc(N); //checkkkk
+    if(inBuff == NULL) {
+        perror("in buffer allocation failed\n");
+        exit(1);
+    }
+    totalRead = 0;
+    while(totalRead < 4) {
+        bytesRead = read(sockfd, inBuff+totalRead, 4-totalRead);
+        if(bytesRead < 0) {
+            perror("read from socket failed\n");
+            exit(1);
+        }
+        totalRead += bytesRead;
+    }
 
+    C = ///
+    close();
+    close();
 
-
-
-
-
-
-
-
+    printf("# of printable characters: %u\n", C);
+    exit(0);
 
 }
