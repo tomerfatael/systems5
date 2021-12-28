@@ -24,7 +24,7 @@ int sendingData(int sockfd, int notWritten, char *buff) {
 int main(int argc, char** argv) {
     uint16_t port;
     uint32_t N, htonlN, C;
-    int sockfd, notWritten, bytesRead, totalRead, retVal;
+    int sockfd, notWritten, bytesRead, totalRead, notRead, retVal;
     char *ip, *path, *NBuff, *outBuff, *inBuff;
     FILE *file;
     struct sockaddr_in serv_addr;
@@ -100,22 +100,25 @@ int main(int argc, char** argv) {
     }
 
     /*reading C from server*/
-    inBuff = (char*)malloc(N); //checkkkk
+    inBuff = (char*)malloc(4*sizeof(char)); //checkkkk
     if(inBuff == NULL) {
         perror("in buffer allocation failed\n");
         exit(1);
     }
+
     totalRead = 0;
-    while(totalRead < 4) {
-        bytesRead = read(sockfd, inBuff+totalRead, 4-totalRead);
+    notRead = 4
+    while(notRead > 0) {
+        bytesRead = read(sockfd, inBuff+totalRead, notRead);
         if(bytesRead < 0) {
             perror("read from socket failed\n");
             exit(1);
         }
         totalRead += bytesRead;
+        notRead -= bytesRead;
     }
 
-    C = ///
+    C = 
     close();
     close();
 
