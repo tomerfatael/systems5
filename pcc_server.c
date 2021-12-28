@@ -9,9 +9,10 @@
 int main(int argc, char** argv) {
     uint16_t port;
     int listenfd;
-    uint32_t pcc_total[127];
     uint32_t C;
     struct sockaddr_in serv_addr;
+    socklen_t addrSize = sizeof(struct sockaddr_in);
+    uint32_t pcc_total[127] = {0};
 
     if(argc != 2) {
         perror("invalid input\n");
@@ -20,6 +21,7 @@ int main(int argc, char** argv) {
 
     port = atoi(argv[1]);
 
+    /*initializing socket*/
     if( (listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("socket creation failed\n");
         exit(1);
@@ -30,7 +32,23 @@ int main(int argc, char** argv) {
     serv_addr.port = htons(port); //check if htonl or htons whats the difference?
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    
+    /*binding socket and listening to incoming TCP connections*/
+    if( 0 != bind(listenfd, (struct sockaddr*) &serv_addr, addrSize) ) {
+        perror("bind failed\n");
+        exit(1);
+    }
+
+    if( 0 != listen(listenfd, 10) ) {
+        perror("listen failed\n");
+        exit(1);
+    }
+
+    while(1) {
+        
+    }
+
+
+
 
 
 }
