@@ -113,7 +113,7 @@ int main(int argc, char** argv) {
         totalRead += bytesRead;
         notRead -= bytesRead;
     }
-
+s
     C = nthol(intBuff);
     close(file);
     close(sockfd);

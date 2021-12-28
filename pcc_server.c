@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
     uint32_t N, C, intBuff;
     int listenfd, connfd, retVal;
     socklen_t addrSize = sizeof(struct sockaddr_in);
-    char *NBuff, *inBuff;
+    char *inBuff, *outBuff;
     struct sockaddr_in serv_addr;
     struct sockaddr_in peer_addr;
     uint32_t pcc_total[127] = {0};
@@ -84,9 +84,6 @@ int main(int argc, char** argv) {
            perror("accept failed\n");
            exit(1);
        }
-
-
-
 
 
         
