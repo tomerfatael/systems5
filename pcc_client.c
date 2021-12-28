@@ -6,10 +6,25 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 
+int sendingData(int sockfd, int notWritten, char *buff) {
+    int bytesWrite, totalSent;
+    totalSent = 0;
+    while(notWritten > 0) {
+        bytesWrite = write(sockfd, buff+totalSent, notWritten);
+        if(bytesWrite < 0) {
+            return 0;
+        }
+        totalSent += bytesWrite;
+        notWritten -= bytesWrite;
+    }
+    return 1;
+}
+
+
 int main(int argc, char** argv) {
     uint16_t port;
     uint32_t N, htonlN, C;
-    int sockfd, bytesWrite, notWritten, totalSent, bytesRead, totalRead, i;
+    int sockfd, notWritten, bytesRead, totalRead, retVal;
     char *ip, *path, *NBuff, *outBuff, *inBuff;
     FILE *file;
     struct sockaddr_in serv_addr;
@@ -65,20 +80,10 @@ int main(int argc, char** argv) {
 
     /*sending file size to server*/
     NBuff = (char*)&htonlN;
-    notWritten = 4;
-    totalSent = 0;
-    while(notWritten > 0) {
-        bytesWrite = write(sockfd, NBuff+totalSent, notWritten);
-        if(bytesWrite < 0) {
-            perror("writing to socket failed\n");
-            exit(1);
-        }
-        totalSent += bytesWrite;
-        notWritten -= bytesWrite;
-    }
-
-    while(notWritten > 0) {
-        bytesWrite = write(sockfd, ); 
+    retVal = sendingData(sockfd, 4, NBuff);
+    if(retVal == 0) {
+        perror("writing to socket failed\n");
+        exit(1);
     }
 
     /*writing file to outBuff*/
@@ -88,16 +93,10 @@ int main(int argc, char** argv) {
     }
 
     /*sending file to server*/
-    notWritten = N; 
-    totalSent = 0;
-    while(notWritten > 0) {
-        bytesWrite = write(sockfd, outBuff+totalSent, notWritten);
-        if(bytesWrite < 0) {
-            perror("writing to socket failed\n");
-            exit(1);
-        }
-        totalSent += bytesWrite;
-        notWritten -= bytesWrite;
+    retVal = sendingData(sockfd, N, outBuff);
+    if(retVal == 0) {
+        perror("writing to socket failed\n");
+        exit(1);
     }
 
     /*reading C from server*/
