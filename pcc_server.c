@@ -8,9 +8,10 @@
 
 int main(int argc, char** argv) {
     uint16_t port;
-    int listenfd;
     uint32_t C;
+    int listenfd, connfd;
     struct sockaddr_in serv_addr;
+    struct sockaddr_in peer_addr;
     socklen_t addrSize = sizeof(struct sockaddr_in);
     uint32_t pcc_total[127] = {0};
 
@@ -44,7 +45,9 @@ int main(int argc, char** argv) {
     }
 
     while(1) {
+        connfd = accept(listenfd, (struct sockaddr*) &peer_addr, &addrSize);
         
+
     }
 
 
