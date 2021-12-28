@@ -6,15 +6,13 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 
-
 int main(int argc, char** argv) {
     uint16_t port;
     uint32_t N, htonlN, C;
-    int sockfd, bytesWrite, notWritten, totalSent, bytesRead, totalRead;
-    char *ip, *path *outBuff, *inBuff;
+    int sockfd, bytesWrite, notWritten, totalSent, bytesRead, totalRead, i;
+    char *ip, *path, *NBuff, *outBuff, *inBuff;
     FILE *file;
     struct sockaddr_in serv_addr;
-    struct stat st;
 
     if(argc != 4) {
         perror("invalid input\n");
@@ -33,7 +31,7 @@ int main(int argc, char** argv) {
     }
 
     /*initializing socket*/
-    if( (sockfd = socket(AF_INET, SOCK_STREAM, 0) < 0) {
+    if( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("socket creation failed\n");
         exit(1);
     }
@@ -56,7 +54,7 @@ int main(int argc, char** argv) {
     fseek(file, 0L, SEEK_END);
     N = ftell(file);
     htonlN = htonl(N);
-    fseek(file, 0L, SEEK_SET);
+    fseek(file, 0L, SEEK_SET); //change to rewind
 
     /*allocating the sending buffer*/
     outBuff = (char*)malloc(N);
@@ -66,9 +64,27 @@ int main(int argc, char** argv) {
     }
 
     /*sending file size to server*/
+    NBuff = (char*)&htonlN;
     notWritten = 4;
+    totalSent = 0;
     while(notWritten > 0) {
-        bytesWrite = write(sockfd, ) //to completeeee
+        bytesWrite = write(sockfd, NBuff+totalSent, notWritten);
+        if(bytesWrite < 0) {
+            perror("writing to socket failed\n");
+            exit(1);
+        }
+        totalSent += bytesWrite;
+        notWritten -= bytesWrite;
+    }
+
+    while(notWritten > 0) {
+        bytesWrite = write(sockfd, ); 
+    }
+
+    /*writing file to outBuff*/
+    if( (fread(outBuff, 1, N, file)) != N ) {
+        perror("read from file failed\n");
+        exit(1);
     }
 
     /*sending file to server*/
