@@ -6,6 +6,8 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 
+uint32_t pcc_total[127] = {0};
+
 int sendingData(int sockfd, int notWritten, char *buff) {
     int bytesWrite, totalSent;
     totalSent = 0;
@@ -36,15 +38,26 @@ int readingData(int connfd, int notRead, char *buff) {
     return 1;
 }
 
+int countPrintableChars(int N, char *clientBuff) {
+    int i, C;
+    C = 0;
+    for(i = 0; i < N; i++) {
+        if(32 <= clientBuff[i] && clientBuff[i] <= 126) {
+            pcc_total[(int)clientBuff[i]]++;
+            C++;
+        }
+    }
+    return C;
+}
+
 int main(int argc, char** argv) {
     uint16_t port;
     uint32_t N, C, intBuff;
     int listenfd, connfd, retVal;
     socklen_t addrSize = sizeof(struct sockaddr_in);
-    char *inBuff, *outBuff;
+    char *inBuff, *clientBuff;
     struct sockaddr_in serv_addr;
     struct sockaddr_in peer_addr;
-    uint32_t pcc_total[127] = {0};
 
     if(argc != 2) {
         perror("invalid input\n");
@@ -75,15 +88,44 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    /*reading N from client*/
-    NBuff = (char*)&(intBuff);
-
-
     while(1) {
        if( (connfd = accept(listenfd, (struct sockaddr*) &peer_addr, &addrSize)) < 0 ) {
            perror("accept failed\n");
            exit(1);
        }
+
+       /*reading N from clien*/ //this should be in if statement to run only once not??
+        inBuff = (char*)&intBuff;
+        retVal = readingData(connfd, 4, inBuff);
+        if(retVal == 0) {
+            perror("read from socket failed\n"); //check about errno cases
+            exit(1);
+        }
+        N = nthol(intBuff);
+
+        /*reading file data from client*/
+        clientBuff = (char*)malloc(N); //also this need to run only once???
+        if(clientBuff == NULL) {
+            perror("client buffer allocation failed\n");
+            exit(1);
+        }
+        retVal = readingData(connfd, N, clientBuff);
+        if(retVal == 0) {
+            perror("read from socket failed\n"); //check about errno cases
+            exit(1);
+        }
+
+        /*counting printable characters and C*/
+        C = countPrintableChars(N, clientBuff);
+
+        /*sending C back to client*/
+
+
+
+
+
+
+
 
 
         

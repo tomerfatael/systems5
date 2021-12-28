@@ -101,7 +101,6 @@ int main(int argc, char** argv) {
 
     /*reading C from server*/
     inBuff = (char*)&(intBuff);
-
     totalRead = 0;
     notRead = 4;
     while(notRead > 0) {
@@ -113,7 +112,7 @@ int main(int argc, char** argv) {
         totalRead += bytesRead;
         notRead -= bytesRead;
     }
-s
+
     C = nthol(intBuff);
     close(file);
     close(sockfd);
