@@ -23,7 +23,7 @@ int sendingData(int sockfd, int notWritten, char *buff) {
 
 int main(int argc, char** argv) {
     uint16_t port;
-    uint32_t N, htonlN, C;
+    uint32_t N, htonlN, C, intBuff;
     int sockfd, notWritten, bytesRead, totalRead, notRead, retVal;
     char *ip, *path, *NBuff, *outBuff, *inBuff;
     FILE *file;
@@ -100,14 +100,10 @@ int main(int argc, char** argv) {
     }
 
     /*reading C from server*/
-    inBuff = (char*)malloc(4*sizeof(char)); //checkkkk
-    if(inBuff == NULL) {
-        perror("in buffer allocation failed\n");
-        exit(1);
-    }
+    inBuff = (char*)&(intBuff);
 
     totalRead = 0;
-    notRead = 4
+    notRead = 4;
     while(notRead > 0) {
         bytesRead = read(sockfd, inBuff+totalRead, notRead);
         if(bytesRead < 0) {
@@ -118,11 +114,10 @@ int main(int argc, char** argv) {
         notRead -= bytesRead;
     }
 
-    C = 
-    close();
-    close();
+    C = nthol(intBuff);
+    close(file);
+    close(sockfd);
 
     printf("# of printable characters: %u\n", C);
     exit(0);
-
 }
