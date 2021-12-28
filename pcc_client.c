@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     uint16_t port;
     uint32_t N, htonlN, C, intBuff;
     int sockfd, notWritten, bytesRead, totalRead, notRead, retVal;
-    char *ip, *path, *NBuff, *outBuff, *inBuff;
+    char *ip, *path, *outBuff, *inBuff;
     FILE *file;
     struct sockaddr_in serv_addr;
 
@@ -79,8 +79,8 @@ int main(int argc, char** argv) {
     }
 
     /*sending file size to server*/
-    NBuff = (char*)&htonlN;
-    retVal = sendingData(sockfd, 4, NBuff);
+    inBuff = (char*)&htonlN;
+    retVal = sendingData(sockfd, 4, inBuff);
     if(retVal == 0) {
         perror("writing to socket failed\n");
         exit(1);
