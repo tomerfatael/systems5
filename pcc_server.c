@@ -8,6 +8,8 @@
 
 uint32_t pcc_total[127] = {0};
 
+//add SIGINT handler
+
 int sendingData(int sockfd, int notWritten, char *buff) {
     int bytesWrite, totalSent;
     totalSent = 0;
@@ -115,18 +117,23 @@ int main(int argc, char** argv) {
             exit(1);
         }
 
+    free(); //checkkk
+
         /*counting printable characters and C*/
         C = countPrintableChars(N, clientBuff);
 
         /*sending C back to client*/
+        intBuff = htonl(C);
+        inBuff = (char*)&intBuff; //check if it is OK maybe need to free allocated memory first
+        retVal = sendingData(connfd, 4, inBuff);
+        if(retVal == 0) {
+            perror("sending C to cliend failed\n");
+            exit(1);
+        }
 
-
-
-
-
-
-
-
+        close(); //checkk
+        close();
+        close();
 
         
 
