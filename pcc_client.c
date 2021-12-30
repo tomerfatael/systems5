@@ -57,13 +57,10 @@ int main(int argc, char** argv) {
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
-    if( (inet_pton(ip, &serv_addr.sin_addr) != 1) ) { //implicit declaretion
-        perror("converting ip failed\n");
-        exit(1);
-    }
+    inet_pton(ip, &serv_addr.sin_addr);
 
     /*connceting to server*/
-    if( (connect(sockfd, (struct sock addr*) &serv_addr, sizeof(serv_addr))  < 0) {
+    if( (connect(sockfd, (struct sock addr*) &serv_addr, sizeof(serv_addr))  < 0) ) {
         perror("connect failed\n");
         exit(1);
     }
