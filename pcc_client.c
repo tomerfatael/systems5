@@ -27,7 +27,7 @@ int sendingData(int sockfd, int notWritten, char *buff) {
 int main(int argc, char** argv) {
     uint16_t port;
     uint32_t N, htonlN, C, intBuff;
-    int sockfd, notWritten, bytesRead, totalRead, notRead, retVal;
+    int sockfd, bytesRead, totalRead, notRead, retVal;
     char *ip, *path, *outBuff, *inBuff;
     FILE *file;
     struct sockaddr_in serv_addr;
@@ -113,8 +113,8 @@ int main(int argc, char** argv) {
         notRead -= bytesRead;
     }
 
-    C = nthol(intBuff);
-    close(file);
+    C = ntohl(intBuff);
+    fclose(file);
     close(sockfd);
 
     printf("# of printable characters: %u\n", C);
