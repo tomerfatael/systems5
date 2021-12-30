@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
     sa.sa_handler = &SIGINT_handler;
     sa.sa_flags = SA_RESTART;
     sigemptyset(&sa.sa_mask); //checkk
-    if( (sigactio(SIGINT, &sa, NULL)) != 0){ //implicit declaretion
+    if( (sigaction(SIGINT, &sa, NULL)) != 0){ //implicit declaretion
         perror("sigaction failed\n");
         exit(1);
     }
@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
 
     memset(&serv_addr, 0, sizeof(serv_addr)); 
     serv_addr.sin_family = AF_INET;
-    serv_addr.port = htons(port);  
+    serv_addr.sin_port = htons(port);  
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); 
 
     /*binding socket and listening to incoming TCP connections*/
@@ -146,7 +146,7 @@ int main(int argc, char** argv) {
             perror("read from socket failed\n"); //check about errno cases
             exit(1);
         }
-        N = nthol(intBuff); 
+        N = ntohl(intBuff); 
 
         /*reading file data from client*/
         clientBuff = (char*)malloc(N); //also this need to run only once???
