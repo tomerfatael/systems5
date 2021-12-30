@@ -8,9 +8,11 @@
 #include <signal.h>
 
 uint32_t pcc_total[127] = {0};
+short isProcessing = 0;
 
 void SIGINT_handler() {
     int i;
+    if(!isProcessing) return; //check about this condition
     for(i = 0; i < 127; i++) {
         if(pcc_total[i] != 0) {
             printf("char '%c' : %u times\n", (char)i, pcc_total[i]);
@@ -109,6 +111,7 @@ int main(int argc, char** argv) {
     }
 
     while(1) {
+        isProcessing = 1; //checkkk
        if( (connfd = accept(listenfd, (struct sockaddr*) &peer_addr, &addrSize)) < 0 ) {
            perror("accept failed\n");
            exit(1);
