@@ -5,10 +5,19 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <signal.h>
 
 uint32_t pcc_total[127] = {0};
 
-//add SIGINT handler
+void SIGINT_handler() {
+    int i;
+    for(i = 0; i < 127; i++) {
+        if(pcc_total[i] != 0) {
+            printf("char '%c' : %u times\n", (char)i, pcc_total[i]);
+        }
+    }
+    exit(0);   
+}
 
 int sendingData(int sockfd, int notWritten, char *buff) {
     int bytesWrite, totalSent;
@@ -60,6 +69,15 @@ int main(int argc, char** argv) {
     char *inBuff, *clientBuff;
     struct sockaddr_in serv_addr;
     struct sockaddr_in peer_addr;
+    struct sigaction sa;
+
+    /*SIGINT handler initialize*/
+    sa.sa_handler = &SIGINT_handler;
+    sa.sa_flags = SA_RESTART;
+    if( (sigactio(SIGINT, &sa, NULL)) != 0){
+        perror("sigaction failed\n");
+        exit(1);
+    }
 
     if(argc != 2) {
         perror("invalid input\n");
