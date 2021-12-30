@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
     inet_pton(ip, &serv_addr.sin_addr);
 
     /*connceting to server*/
-    if( (connect(sockfd, (struct sock addr*) &serv_addr, sizeof(serv_addr))  < 0) ) {
+    if( connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0 ) {
         perror("connect failed\n");
         exit(1);
     }
