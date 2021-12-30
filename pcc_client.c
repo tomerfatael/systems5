@@ -5,6 +5,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <string.h>
+#include <arpa/inet.h>
 
 int sendingData(int sockfd, int notWritten, char *buff) {
     int bytesWrite, totalSent;
@@ -54,7 +57,7 @@ int main(int argc, char** argv) {
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.port = htons(port);
-    if( (inet_pton(ip, &serv_addr.sin_addr) != 1) { //checkk
+    if( (inet_pton(ip, &serv_addr.sin_addr) != 1) ) { //implicit declaretion
         perror("converting ip failed\n");
         exit(1);
     }

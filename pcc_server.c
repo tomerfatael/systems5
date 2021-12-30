@@ -6,6 +6,9 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include <unistd.h>
+#include <string.h>
+#include <arpa/inet.h>
 
 uint32_t pcc_total[127] = {0};
 uint32_t pcc_tmp[127] = {0};
@@ -35,7 +38,7 @@ void updatePccTotal() {
 
 void SIGINT_handler() {
     if(!isProcessing) {
-        pccTotalPrint;
+        pccTotalPrint();
         exit(0);
     }
     flageSIGINT = 1;
@@ -45,7 +48,7 @@ int sendingData(int sockfd, int notWritten, char *buff) {
     int bytesWrite, totalSent;
     totalSent = 0;
     while(notWritten > 0) {
-        bytesWrite = write(sockfd, buff+totalSent, notWritten);
+        bytesWrite = write(sockfd, buff+totalSent, notWritten); 
         if(bytesWrite < 0) {
             return 0;
         }
@@ -60,7 +63,7 @@ int readingData(int connfd, int notRead, char *buff) {
     expected = notRead;
     totalRead = 0;
     while(notRead > 0) {
-        bytesRead = read(connfd, buff+totalRead, notRead);
+        bytesRead = read(connfd, buff+totalRead, notRead); 
         if((bytesRead < 0) || (bytesRead == 0 && totalRead != expected)) { //check about errno maybe need to change
             return 0;
         }
@@ -87,16 +90,15 @@ int main(int argc, char** argv) {
     uint16_t port;
     uint32_t N, C, intBuff;
     int listenfd, connfd, retVal;
-    socklen_t addrSize = sizeof(struct sockaddr_in);
     char *inBuff, *clientBuff;
-    struct sockaddr_in serv_addr;
-    struct sockaddr_in peer_addr;
+    struct sockaddr_in serv_addr; //storage size of serv_addr/peer isnt known
     struct sigaction sa;
 
     /*SIGINT handler initialize*/
     sa.sa_handler = &SIGINT_handler;
     sa.sa_flags = SA_RESTART;
-    if( (sigactio(SIGINT, &sa, NULL)) != 0){
+    sigemptyset(&sa.sa_mask); //checkk
+    if( (sigactio(SIGINT, &sa, NULL)) != 0){ //implicit declaretion
         perror("sigaction failed\n");
         exit(1);
     }
@@ -114,13 +116,13 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    memset(&serv_addr, 0, addrSize);
+    memset(&serv_addr, 0, sizeof(serv_addr)); 
     serv_addr.sin_family = AF_INET;
-    serv_addr.port = htons(port); 
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serv_addr.port = htons(port);  
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); 
 
     /*binding socket and listening to incoming TCP connections*/
-    if( 0 != bind(listenfd, (struct sockaddr*) &serv_addr, addrSize) ) {
+    if( 0 != bind(listenfd, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) ) {
         perror("bind failed\n");
         exit(1);
     }
@@ -132,19 +134,19 @@ int main(int argc, char** argv) {
 
     while(1) {
         isProcessing = 1; //checkkk
-       if( (connfd = accept(listenfd, (struct sockaddr*) &peer_addr, &addrSize)) < 0 ) {
+       if( (connfd = accept(listenfd, NULL, NULL)) < 0 ) {
            perror("accept failed\n");
            exit(1);
        }
 
-       /*reading N from clien*/ //this should be in if statement to run only once not??
+       /*reading N from clien*/ 
         inBuff = (char*)&intBuff;
         retVal = readingData(connfd, 4, inBuff);
         if(retVal == 0) {
             perror("read from socket failed\n"); //check about errno cases
             exit(1);
         }
-        N = nthol(intBuff);
+        N = nthol(intBuff); 
 
         /*reading file data from client*/
         clientBuff = (char*)malloc(N); //also this need to run only once???
@@ -176,6 +178,6 @@ int main(int argc, char** argv) {
 
         zeroPccTmp();
         free(clientBuff);
-        close(connfd); 
+        close(connfd);  
     }
 }
