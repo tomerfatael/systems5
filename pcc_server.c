@@ -133,11 +133,12 @@ int main(int argc, char** argv) {
     }
 
     while(1) {
-        isProcessing = 1; //checkkk
        if( (connfd = accept(listenfd, NULL, NULL)) < 0 ) {
            perror("accept failed\n");
            exit(1);
        }
+
+       isProcessing = 1; //checkkk location
 
        /*reading N from clien*/ 
         inBuff = (char*)&intBuff;
