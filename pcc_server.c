@@ -8,17 +8,37 @@
 #include <signal.h>
 
 uint32_t pcc_total[127] = {0};
+uint32_t pcc_tmp[127] = {0};
+short flageSIGINT = 0;
 short isProcessing = 0;
 
-void SIGINT_handler() {
+void zeroPccTmp() {
     int i;
-    if(!isProcessing) return; //check about this condition
-    for(i = 0; i < 127; i++) {
+    for(i = 0; i < 127; i++) pcc_tmp[i] = 0;
+}
+
+void pccTotalPrint() {
+    int i;
+    for(i = 32; i <= 126; i++) {
         if(pcc_total[i] != 0) {
             printf("char '%c' : %u times\n", (char)i, pcc_total[i]);
         }
     }
-    exit(0);   
+}
+
+void updatePccTotal() {
+    int i;
+    for(i = 0; i < 127; i++) {
+
+    }
+}
+
+void SIGINT_handler() {
+    if(!isProcessing) {
+        pccTotalPrint;
+        exit(0);
+    }
+    flageSIGINT = 1;
 }
 
 int sendingData(int sockfd, int notWritten, char *buff) {
@@ -55,8 +75,8 @@ int countPrintableChars(int N, char *clientBuff) {
     int i, C;
     C = 0;
     for(i = 0; i < N; i++) {
-        if(32 <= clientBuff[i] && clientBuff[i] <= 126) {
-            pcc_total[(int)clientBuff[i]]++;
+        if (32 <= clientBuff[i] && clientBuff[i] <= 126) {
+            pcc_tmp[(int)clientBuff[i]]++;
             C++;
         }
     }
@@ -150,9 +170,12 @@ int main(int argc, char** argv) {
             exit(1);
         }
 
-        free(clientBuff);
-        close(connfd);
-        
+        if(!flageSIGINT) {
+            updatePccTotal();
+        }
 
+        zeroPccTmp();
+        free(clientBuff);
+        close(connfd); 
     }
 }
