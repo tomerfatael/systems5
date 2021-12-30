@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
 
     memset(&serv_addr, 0, addrSize);
     serv_addr.sin_family = AF_INET;
-    serv_addr.port = htons(port); //check if htonl or htons whats the difference?
+    serv_addr.port = htons(port); 
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     /*binding socket and listening to incoming TCP connections*/
@@ -138,8 +138,6 @@ int main(int argc, char** argv) {
             exit(1);
         }
 
-    free(); //checkkk
-
         /*counting printable characters and C*/
         C = countPrintableChars(N, clientBuff);
 
@@ -152,16 +150,9 @@ int main(int argc, char** argv) {
             exit(1);
         }
 
-        close(); //checkk
-        close();
-        close();
-
+        free(clientBuff);
+        close(connfd);
         
 
     }
-
-
-
-
-
 }
