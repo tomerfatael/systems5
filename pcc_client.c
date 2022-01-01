@@ -57,7 +57,10 @@ int main(int argc, char** argv) {
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
-    inet_pton(ip, &serv_addr.sin_addr); //need to check about it!!!!!!
+    if( (inet_pton(AF_INET, ip, &serv_addr.sin_addr)) != 1 ) {//need to check about it!!!!!!
+        perror("inet_pton failed\n");
+        exit(1);
+    } 
 
     /*connceting to server*/
     if( connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0 ) {
