@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
         N = ntohl(intBuff); 
 
         /*reading file data from client*/
-        clientBuff = (char*)malloc(N); //also this need to run only once???
+        clientBuff = (char*)malloc(N); 
         if(clientBuff == NULL) {
             perror("client buffer allocation failed\n");
             exit(1);
@@ -173,6 +173,7 @@ int main(int argc, char** argv) {
             exit(1);
         }
 
+        /*updating pcc_total only if we didn't get SIGINT in the while loop*/
         if(!flageSIGINT) {
             updatePccTotal();
         }
