@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
-    if( (inet_pton(AF_INET, ip, &serv_addr.sin_addr)) != 1 ) {//need to check about it!!!!!!
+    if( (inet_pton(AF_INET, ip, &serv_addr.sin_addr)) != 1 ) {
         perror("inet_pton failed\n");
         exit(1);
     } 
