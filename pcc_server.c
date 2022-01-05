@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <errno.h>
 
 uint32_t pcc_total[127] = {0};
 uint32_t pcc_tmp[127] = {0};
@@ -150,7 +151,7 @@ int main(int argc, char** argv) {
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); 
 
     /*reusing the port*/
-    if( (setsockopt(listfd, SOL_SOCKET, SO_REUSEADDR, &retVal, sizeof(int))) < 0 ) {
+    if( (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &retVal, sizeof(int))) < 0 ) {
         perror("setsockopt faield\n");
         exit(1);
     }
