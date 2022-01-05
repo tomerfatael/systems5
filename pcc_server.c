@@ -49,8 +49,16 @@ int sendingData(int sockfd, int notWritten, char *buff) {
     totalSent = 0;
     while(notWritten > 0) {
         bytesWrite = write(sockfd, buff+totalSent, notWritten); 
+        /*error has occurred*/
         if(bytesWrite < 0) {
-            return 0;
+            /*"real" error*/
+            if((errno != ETIMEDOUT) && (errno != ECONNRESET) && (errno != EPIPE)) {
+                return 0;
+            }
+            /*TCP connection error*/
+            else {
+                return -1;
+            }
         }
         totalSent += bytesWrite;
         notWritten -= bytesWrite;
@@ -64,10 +72,30 @@ int readingData(int connfd, int notRead, char *buff) {
     totalRead = 0;
     while(notRead > 0) {
         bytesRead = read(connfd, buff+totalRead, notRead); 
-        if((bytesRead < 0) || (bytesRead == 0 && totalRead != expected)) { //check about errno maybe need to change
-            return 0;
-        }
+        /*possible errors*/
+        if(bytesRead <= 0) { 
+            /*error has occurred*/
+            if(bytesRead < 0) {
+                /*"real" error*/
+                if((errno != ETIMEDOUT) && (errno != ECONNRESET) && (errno != EPIPE)) {
+                    return 0;
+                }
 
+                /*TCP connection error*/
+                else{
+                    return -1;
+                }
+            }
+            
+            /*bytesRead == 0*/
+            else {
+                /*we didnt finish to read all data from client*/
+                if(expected != totalRead) {
+                    return -1;
+                }   
+            } 
+        }
+        
         totalRead += bytesRead;
         notRead -= bytesRead;
     }
@@ -89,7 +117,7 @@ int countPrintableChars(int N, char *clientBuff) {
 int main(int argc, char** argv) {
     uint16_t port;
     uint32_t N, C, intBuff;
-    int listenfd, connfd, retVal;
+    int listenfd, connfd, retVal = 1;
     char *inBuff, *clientBuff;
     struct sockaddr_in serv_addr; //storage size of serv_addr/peer isnt known
     struct sigaction sa;
@@ -120,6 +148,12 @@ int main(int argc, char** argv) {
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);  
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); 
+
+    /*reusing the port*/
+    if( (setsockopt(listfd, SOL_SOCKET, SO_REUSEADDR, &retVal, sizeof(int))) < 0 ) {
+        perror("setsockopt faield\n");
+        exit(1);
+    }
 
     /*binding socket and listening to incoming TCP connections*/
     if( 0 != bind(listenfd, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) ) {

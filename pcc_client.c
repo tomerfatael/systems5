@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
     totalRead = 0;
     notRead = 4;
     while(notRead > 0) {
-        bytesRead = read(sockfd, inBuff+totalRead, notRead);
+        bytesRead = read(sockfd, inBuff+totalRead, notRead); //check about read
         if(bytesRead < 0) {
             perror("read from socket failed\n");
             exit(1);
