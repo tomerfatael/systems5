@@ -177,10 +177,15 @@ int main(int argc, char** argv) {
 
        /*reading N from clien*/ 
         inBuff = (char*)&intBuff;
-        retVal = readingData(connfd, 4, inBuff);
+        retVal = readingData(connfd, 4, inBuff); //check more cases
         if(retVal == 0) {
             perror("read from socket failed\n"); //check about errno cases
             exit(1);
+        }
+        if(retVal == -1) {
+            close(connfd);
+            isProcessing = 0; //checkk
+            continue;
         }
         N = ntohl(intBuff); 
 
@@ -195,6 +200,11 @@ int main(int argc, char** argv) {
             perror("read from socket failed\n"); //check about errno cases
             exit(1);
         }
+        if(retVal == -1) {
+            close(connfd);
+            isProcessing = 0; //checkk
+            continue;
+        }
 
         /*counting printable characters and C*/
         C = countPrintableChars(N, clientBuff);
@@ -206,6 +216,11 @@ int main(int argc, char** argv) {
         if(retVal == 0) {
             perror("sending C to cliend failed\n");
             exit(1);
+        }
+        if(retVal == -1) {
+            close(connfd);
+            isProcessing = 0; //checkk
+            continue;
         }
 
         /*updating pcc_total only if we didn't get SIGINT in the while loop*/
