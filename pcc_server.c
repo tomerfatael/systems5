@@ -151,10 +151,10 @@ int main(int argc, char** argv) {
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); 
 
     /*reusing the port*/
-    // if( (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &retVal, sizeof(int))) < 0 ) {
-    //     perror("setsockopt faield\n");
-    //     exit(1);
-    // }
+    if( (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &retVal, sizeof(int))) < 0 ) {
+        perror("setsockopt faield\n");
+        exit(1);
+    }
 
     /*binding socket and listening to incoming TCP connections*/
     if( 0 != bind(listenfd, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) ) {
