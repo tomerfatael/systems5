@@ -32,8 +32,8 @@ void pccTotalPrint() {
 
 void updatePccTotal() {
     int i;
-    for(i = 0; i < 127; i++) {
-
+    for(i = 32; i <= 126; i++) {
+        pcc_total[i] += pcc_tmp[i];
     }
 }
 
