@@ -120,14 +120,14 @@ int main(int argc, char** argv) {
     uint32_t N, C, intBuff;
     int listenfd, connfd, retVal = 1;
     char *inBuff, *clientBuff;
-    struct sockaddr_in serv_addr; //storage size of serv_addr/peer isnt known
+    struct sockaddr_in serv_addr; 
     struct sigaction sa;
 
     /*SIGINT handler initialize*/
     sa.sa_handler = &SIGINT_handler;
     sa.sa_flags = SA_RESTART;
-    sigemptyset(&sa.sa_mask); //checkk
-    if( (sigaction(SIGINT, &sa, NULL)) != 0){ //implicit declaretion
+    sigemptyset(&sa.sa_mask); 
+    if( (sigaction(SIGINT, &sa, NULL)) != 0){ 
         perror("sigaction failed\n");
         exit(1);
     }
@@ -168,23 +168,28 @@ int main(int argc, char** argv) {
     }
 
     while(1) {
+        if(flageSIGINT) {
+            pccTotalPrint();
+            exit(0);
+        }
+
        if( (connfd = accept(listenfd, NULL, NULL)) < 0 ) {
            perror("accept failed\n");
            exit(1);
        }
 
-       isProcessing = 1; //checkkk location
+       isProcessing = 1; 
 
        /*reading N from clien*/ 
         inBuff = (char*)&intBuff;
-        retVal = readingData(connfd, 4, inBuff); //check more cases
+        retVal = readingData(connfd, 4, inBuff); 
         if(retVal == 0) {
-            perror("read from socket failed\n"); //check about errno cases
+            perror("read from socket failed\n"); 
             exit(1);
         }
         if(retVal == -1) {
             close(connfd);
-            isProcessing = 0; //checkk
+            isProcessing = 0; 
             continue;
         }
         N = ntohl(intBuff); 
@@ -197,12 +202,13 @@ int main(int argc, char** argv) {
         }
         retVal = readingData(connfd, N, clientBuff);
         if(retVal == 0) {
-            perror("read from socket failed\n"); //check about errno cases
+            perror("read from socket failed\n"); 
             exit(1);
         }
         if(retVal == -1) {
+            free(clientBuff);
             close(connfd);
-            isProcessing = 0; //checkk
+            isProcessing = 0; 
             continue;
         }
 
@@ -211,15 +217,16 @@ int main(int argc, char** argv) {
 
         /*sending C back to client*/
         intBuff = htonl(C);
-        inBuff = (char*)&intBuff; //check if it is OK maybe need to free allocated memory first
+        inBuff = (char*)&intBuff; 
         retVal = sendingData(connfd, 4, inBuff);
         if(retVal == 0) {
             perror("sending C to cliend failed\n");
             exit(1);
         }
         if(retVal == -1) {
+            free(clientBuff);
             close(connfd);
-            isProcessing = 0; //checkk
+            isProcessing = 0; 
             continue;
         }
 
@@ -230,6 +237,7 @@ int main(int argc, char** argv) {
 
         zeroPccTmp();
         free(clientBuff);
-        close(connfd);  
+        close(connfd);
+        isProcessing = 0;  
     }
 }
