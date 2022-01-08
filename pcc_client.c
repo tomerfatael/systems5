@@ -48,26 +48,6 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    /*initializing socket*/
-    if( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("socket creation failed\n");
-        exit(1);
-    }
-
-    memset(&serv_addr, 0, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(port);
-    if( (inet_pton(AF_INET, ip, &serv_addr.sin_addr)) != 1 ) {
-        perror("inet_pton failed\n");
-        exit(1);
-    } 
-
-    /*connceting to server*/
-    if( connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0 ) {
-        perror("connect failed\n");
-        exit(1);
-    }
-
     /*determine the file size*/
     fseek(file, 0L, SEEK_END);
     N = ftell(file);
@@ -78,6 +58,27 @@ int main(int argc, char** argv) {
     outBuff = (char*)malloc(N);
     if(outBuff == NULL) {
         perror("out buffer allocation failed\n");
+        exit(1);
+    }
+
+    /*creating server*/
+    memset(&serv_addr, 0, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(port);
+    if( (inet_pton(AF_INET, ip, &serv_addr.sin_addr)) != 1 ) {
+        perror("inet_pton failed\n");
+        exit(1);
+    } 
+
+    /*initializing socket*/
+    if( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("socket creation failed\n");
+        exit(1);
+    }
+
+    /*connceting to server*/
+    if( connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0 ) {
+        perror("connect failed\n");
         exit(1);
     }
 
@@ -107,7 +108,7 @@ int main(int argc, char** argv) {
     totalRead = 0;
     notRead = 4;
     while(notRead > 0) {
-        bytesRead = read(sockfd, inBuff+totalRead, notRead); //check about read
+        bytesRead = read(sockfd, inBuff+totalRead, notRead); 
         if(bytesRead < 0) {
             perror("read from socket failed\n");
             exit(1);
@@ -117,6 +118,7 @@ int main(int argc, char** argv) {
     }
 
     C = ntohl(intBuff);
+    free(outBuff);
     fclose(file);
     close(sockfd);
 
